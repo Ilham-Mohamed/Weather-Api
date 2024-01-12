@@ -1,7 +1,29 @@
 const User = require('../models/user.js');
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'aaaaaa';
+
+const login = async (req, res) => {
+  const user = await User.findOne({
+    email: req.body.email,
+  });
+
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const isPasswordValid = await user.comparePassword(req.body.password);
+
+  if (!isPasswordValid) {
+    return res.status(401).json({ error: 'Incorrect password' });
+  }
+  const token = jwt.sign({ user_id: user._id }, SECRET_KEY, {
+    expiresIn: '6h',
+  });
+
+  res.json({ token });
+};
 
 const createUser = async (req, res) => {
-  const { email, location } = req.body;
+  const { email, password, location } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -12,8 +34,13 @@ const createUser = async (req, res) => {
         .json({ error: 'User with this email already exists' });
     }
 
-    const user = await User.create({ email, location });
-    res.json(user);
+    const newUser = await User.create({ email, password, location });
+
+    const token = jwt.sign({ user_id: newUser._id }, SECRET_KEY, {
+      expiresIn: '6h',
+    });
+
+    res.json({ token, newUser });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
@@ -22,6 +49,14 @@ const createUser = async (req, res) => {
 const updateLocation = async (req, res) => {
   const { userId } = req.params;
   const { location } = req.body;
+
+  const tokenUserId = req.user.user_id;
+
+  if (userId !== tokenUserId) {
+    return res
+      .status(403)
+      .json({ error: 'Invalid User' });
+  }
 
   try {
     const user = await User.findByIdAndUpdate(
@@ -41,7 +76,13 @@ const updateLocation = async (req, res) => {
 };
 
 const getWeatherData = async (req, res) => {
-  const { userId, date } = req.params;
+    const { userId, date } = req.params;
+    
+    const tokenUserId = req.user.user_id;
+
+    if (userId !== tokenUserId) {
+      return res.status(403).json({ error: 'Invalid User' });
+    }
 
   try {
     const user = await User.findById(userId);
@@ -59,4 +100,5 @@ module.exports = {
   createUser,
   updateLocation,
   getWeatherData,
+  login,
 };

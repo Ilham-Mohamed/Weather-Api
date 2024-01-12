@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const axios = require('axios');
-const nodemailer = require('nodemailer');
 
 const routes = require('./routes');
 

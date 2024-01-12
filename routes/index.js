@@ -5,12 +5,23 @@ const cron = require('node-cron');
 const sgMail = require('@sendgrid/mail');
 const User = require('../models/user.js');
 const userController = require('../controllers/userController.js');
+const { authenticate } = require('../middleware/authMiddleware.js');
 
 sgMail.setApiKey(`${process.env.SENDGRID_KEY}`);
 
-router.post('/user', userController.createUser);
-router.put('/update-location/:userId', userController.updateLocation);
-router.get('/weather/:userId/:date', userController.getWeatherData);
+router.post('/login', userController.login);
+
+router.post('/create-user', userController.createUser);
+router.put(
+  '/update-location/:userId',
+  authenticate,
+  userController.updateLocation
+);
+router.get(
+  '/weather/:userId/:date',
+  authenticate,
+  userController.getWeatherData
+);
 
 cron.schedule('0 */3 * * *', async () => {
   const users = await User.find();
@@ -26,7 +37,7 @@ cron.schedule('0 */3 * * *', async () => {
       } = weatherResponse.data;
 
       user.weatherData.push({ data: { temp, humidity } });
-      await user.save();
+      await user.save({ validateBeforeSave: false });
 
       const msg = {
         to: user.email,
