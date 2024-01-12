@@ -9,16 +9,16 @@ WeatherAPI is a Node.js application that provides weather information based on u
 
 ## Installation
 1. Clone the repository:
-   git clone https://github.com/Ilham-Mohamed/Weather-Api.git
+   * git clone https://github.com/Ilham-Mohamed/Weather-Api.git
 
 2. Install dependencies:
-   npm install
+   * npm install
 
 3. Set up environment variables:
-   Create a .env file in the root directory with the following:
-   DATABASE_URL = mongodb+srv://ilham1998evr:ilham1998@weatherapinew.mmfiyje.mongodb.net/weather_api?retryWrites=true&w=majority
-   SENDGRID_KEY=your_sendgrid_api_key
-   WEATHERMAP_KEY=your_openweathermap_api_key
+   * Create a .env file in the root directory with the following:
+     * DATABASE_URL = mongodb+srv://ilham1998evr:ilham1998@weatherapinew.mmfiyje.mongodb.net/weather_api?retryWrites=true&w=majority
+     * SENDGRID_KEY=your_sendgrid_api_key
+     * WEATHERMAP_KEY=your_openweathermap_api_key
 
 
 
