@@ -6,7 +6,7 @@ const cron = require('node-cron');
 const sgMail = require('@sendgrid/mail');
 
 const router = express.Router();
-sgMail.setApiKey(process.env.SENDGRID_KEY);
+sgMail.setApiKey(`${process.env.SENDGRID_KEY}`);
 
 router.post('/user', async (req, res) => {
   const { email, location } = req.body;
