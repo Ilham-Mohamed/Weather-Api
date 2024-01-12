@@ -19,7 +19,7 @@ const login = async (req, res) => {
     expiresIn: '6h',
   });
 
-  res.json({ token });
+  res.json({ token, user });
 };
 
 const createUser = async (req, res) => {
@@ -53,9 +53,7 @@ const updateLocation = async (req, res) => {
   const tokenUserId = req.user.user_id;
 
   if (userId !== tokenUserId) {
-    return res
-      .status(403)
-      .json({ error: 'Invalid User' });
+    return res.status(403).json({ error: 'Invalid User' });
   }
 
   try {
@@ -76,13 +74,13 @@ const updateLocation = async (req, res) => {
 };
 
 const getWeatherData = async (req, res) => {
-    const { userId, date } = req.params;
-    
-    const tokenUserId = req.user.user_id;
+  const { userId, date } = req.params;
 
-    if (userId !== tokenUserId) {
-      return res.status(403).json({ error: 'Invalid User' });
-    }
+  const tokenUserId = req.user.user_id;
+
+  if (userId !== tokenUserId) {
+    return res.status(403).json({ error: 'Invalid User' });
+  }
 
   try {
     const user = await User.findById(userId);
