@@ -73,8 +73,8 @@ My Vercel Deployment URL
             password: 123456
       
    3. https://weather-api-eight-flax.vercel.app/api/update-location/65a166626bcc3167099aebad
-         Method: PUT
-         Request Body:
+         * Method: PUT
+         * Request Body:
          {
             "location": "Your_Location"
          }
