@@ -1,64 +1,16 @@
-require('dotenv').config();
 const express = require('express');
-const User = require('../model/user.js');
+const router = express.Router();
 const axios = require('axios');
 const cron = require('node-cron');
 const sgMail = require('@sendgrid/mail');
+const User = require('../models/user.js');
+const userController = require('../controllers/userController.js');
 
-const router = express.Router();
 sgMail.setApiKey(`${process.env.SENDGRID_KEY}`);
 
-router.post('/user', async (req, res) => {
-  const { email, location } = req.body;
-
-  try {
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res
-        .status(409)
-        .json({ error: 'User with this email already exists' });
-    }
-    const user = await User.create({ email, location });
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-router.put('/update-location/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const { location } = req.body;
-
-  try {
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { location },
-      { new: true }
-    );
-    if (user) {
-      res.json({ message: 'Location updated successfully', user });
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-router.get('/weather/:userId/:date', async (req, res) => {
-  const { userId, date } = req.params;
-
-  try {
-    const user = await User.findById(userId);
-    const weatherData = user.weatherData.filter(
-      (data) => data.date.toISOString().split('T')[0] === date
-    );
-    res.json(weatherData);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+router.post('/user', userController.createUser);
+router.put('/update-location/:userId', userController.updateLocation);
+router.get('/weather/:userId/:date', userController.getWeatherData);
 
 cron.schedule('0 */3 * * *', async () => {
   const users = await User.find();
